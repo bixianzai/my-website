@@ -16,28 +16,28 @@ const projects: Project[] = [
     title: "E-Commerce Platform",
     description:
       "A full-stack online store built with React and Node.js, featuring real-time inventory management and Stripe payment integration.",
-    githubUrl: "https://github.com/alexchen/ecommerce-platform",
+    githubUrl: "https://github.com/bixianzai/ecommerce-platform",
   },
   {
     image: img02,
     title: "Weather Dashboard",
     description:
       "Interactive weather visualization app using OpenWeather API with 7-day forecasts, radar maps, and severe weather alerts.",
-    githubUrl: "https://github.com/alexchen/weather-dashboard",
+    githubUrl: "https://github.com/bixianzai/weather-dashboard",
   },
   {
     image: img03,
     title: "Task Manager API",
     description:
       "RESTful API service for task management with JWT authentication, role-based access control, and PostgreSQL backend.",
-    githubUrl: "https://github.com/alexchen/task-manager-api",
+    githubUrl: "https://github.com/bixianzai/task-manager-api",
   },
   {
     image: img04,
     title: "Markdown Note Editor",
     description:
       "A browser-based Markdown editor with live preview, syntax highlighting, file export, and local storage persistence.",
-    githubUrl: "https://github.com/alexchen/markdown-editor",
+    githubUrl: "https://github.com/bixianzai/markdown-editor",
   },
 ];
 

@@ -33,7 +33,7 @@ export default function NavBar() {
           href="#"
           className="text-lg font-semibold tracking-tight text-gray-900 dark:text-gray-100 hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
         >
-          Alex Chen
+          老梁
         </a>
 
         {/* Navigation links */}
