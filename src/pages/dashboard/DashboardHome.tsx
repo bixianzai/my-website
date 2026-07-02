@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../../contexts/AuthContext'
-import { type DailyGoal, type TrendPoint, type CalendarDay, mockSuggestions } from '../../data/mockData'
+import { type DailyGoal, type TrendPoint, type CalendarDay } from '../../data/mockData'
 import { type AchievementStatus } from '../../data/achievements'
 import StatCard from '../../components/dashboard/StatCard'
 import DailyGoalList from '../../components/dashboard/DailyGoalList'
@@ -133,7 +133,7 @@ export default function DashboardHome() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <section><DailyGoalList goals={goals} /></section>
-          <section><SuggestionPanel suggestions={mockSuggestions} /></section>
+          <section><SuggestionPanel /></section>
         </div>
       )}
 

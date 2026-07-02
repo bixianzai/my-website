@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import ChatBubble from '../../components/dashboard/ChatBubble'
 import { api } from '../../lib/api'
@@ -8,11 +8,14 @@ interface Message { role: 'user' | 'assistant'; content: string }
 
 export default function ChatPage() {
   const { state } = useAuth()
+  const [searchParams] = useSearchParams()
+  const prefilled = searchParams.get('q') || ''
   const [messages, setMessages] = useState<Message[]>([])
-  const [input, setInput] = useState('')
+  const [input, setInput] = useState(prefilled)
   const [streaming, setStreaming] = useState(false)
   const [error, setError] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
+  const prefilledSent = useRef(false)
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages])
 
@@ -24,12 +27,23 @@ export default function ChatPage() {
     }
   }, [state.user])
 
-  const send = async () => {
-    const text = input.trim()
-    if (!text || streaming) return
-    setInput('')
+  // Auto-send prefilled message from URL param
+  useEffect(() => {
+    if (prefilled && !prefilledSent.current && state.user) {
+      prefilledSent.current = true
+      // Delay to let the component render first
+      const timer = setTimeout(() => {
+        setInput('')
+        setMessages((prev) => [...prev, { role: 'user', content: prefilled }, { role: 'assistant', content: '' }])
+        setStreaming(true)
+        sendMessage(prefilled)
+      }, 300)
+      return () => clearTimeout(timer)
+    }
+  }, [prefilled, state.user])
+
+  const sendMessage = async (text: string) => {
     setError('')
-    setMessages((prev) => [...prev, { role: 'user', content: text }, { role: 'assistant', content: '' }])
     setStreaming(true)
 
     try {
@@ -76,6 +90,14 @@ export default function ChatPage() {
       }
     } catch { setError('网络错误，请稍后重试') }
     setStreaming(false)
+  }
+
+  const send = async () => {
+    const text = input.trim()
+    if (!text || streaming) return
+    setInput('')
+    setMessages((prev) => [...prev, { role: 'user', content: text }, { role: 'assistant', content: '' }])
+    await sendMessage(text)
   }
 
   if (!state.user) {

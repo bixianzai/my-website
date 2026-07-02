@@ -12,8 +12,9 @@ interface GoalFromApi { id: number; title: string; completed: boolean; sort_orde
 function apiGoalToDailyGoal(g: GoalFromApi): DailyGoal { return { id: String(g.id), title: g.title, completed: g.completed } }
 
 const TPL_TITLES: Record<string, string> = {
-  'tpl-read': '阅读技术文章 30 分钟', 'tpl-leetcode': 'LeetCode 刷题 2 道', 'tpl-course': '完成在线课程 1 小节',
-  'tpl-notes': '整理学习笔记并复习', 'tpl-opensource': '阅读开源项目源码 30 分钟', 'tpl-blog': '写一篇技术博客或学习总结',
+  'tpl-operations': '完成 10 道有理数运算练习', 'tpl-equation': '解 5 道一元一次方程',
+  'tpl-geometry': '练习线段与角的计算 3 道', 'tpl-review': '整理本周错题并重做',
+  'tpl-word-problems': '完成 2 道方程应用题', 'tpl-challenge': '挑战 1 道压轴题并总结思路',
 }
 
 export default function GoalsPage() {
