@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
 import DailyGoalList from '../../components/dashboard/DailyGoalList'
 import GoalTemplatePicker from '../../components/dashboard/GoalTemplatePicker'
-import { mockDailyGoals, type DailyGoal } from '../../data/mockData'
+import { type DailyGoal } from '../../data/mockData'
 import { type GoalTemplate } from '../../data/goalTemplates'
 import { api } from '../../lib/api'
 
@@ -19,7 +19,7 @@ const TPL_TITLES: Record<string, string> = {
 export default function GoalsPage() {
   const { state } = useAuth()
   const isAuthenticated = !!state.user
-  const [goals, setGoals] = useState<DailyGoal[]>(mockDailyGoals)
+  const [goals, setGoals] = useState<DailyGoal[]>([])
   const [addedTemplateIds, setAddedTemplateIds] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
 
@@ -30,34 +30,26 @@ export default function GoalsPage() {
         setGoals(data.map(apiGoalToDailyGoal))
         const goalTitles = new Set(data.map((g) => g.title))
         setAddedTemplateIds(Object.keys(TPL_TITLES).filter((id) => goalTitles.has(TPL_TITLES[id])))
-      }).catch(() => setGoals(mockDailyGoals)).finally(() => setLoading(false))
+      }).catch(() => setGoals([])).finally(() => setLoading(false))
     } else {
-      setGoals(mockDailyGoals)
+      setGoals([])
     }
   }, [isAuthenticated])
 
   const handleAdd = useCallback(async (title: string) => {
-    if (isAuthenticated) {
-      try { const g = await api.post<GoalFromApi>('/goals', { title }); setGoals((prev) => [...prev, apiGoalToDailyGoal(g)]) } catch {}
-    } else {
-      setGoals((prev) => [...prev, { id: `local-${Date.now()}`, title, completed: false }])
-    }
-  }, [isAuthenticated])
+    try { const g = await api.post<GoalFromApi>('/goals', { title }); setGoals((prev) => [...prev, apiGoalToDailyGoal(g)]) } catch {}
+  }, [])
 
   const handleToggle = useCallback(async (id: string) => {
-    if (isAuthenticated) {
-      const goal = goals.find((g) => g.id === id)
-      if (!goal) return
-      try { const u = await api.put<GoalFromApi>(`/goals/${id}`, { completed: !goal.completed }); setGoals((prev) => prev.map((g) => g.id === id ? apiGoalToDailyGoal(u) : g)) } catch {}
-    } else {
-      setGoals((prev) => prev.map((g) => g.id === id ? { ...g, completed: !g.completed } : g))
-    }
-  }, [isAuthenticated, goals])
+    const goal = goals.find((g) => g.id === id)
+    if (!goal) return
+    try { const u = await api.put<GoalFromApi>(`/goals/${id}`, { completed: !goal.completed }); setGoals((prev) => prev.map((g) => g.id === id ? apiGoalToDailyGoal(u) : g)) } catch {}
+  }, [goals])
 
   const handleDelete = useCallback(async (id: string) => {
-    if (isAuthenticated) { try { await api.del(`/goals/${id}`) } catch {} }
+    try { await api.del(`/goals/${id}`) } catch {}
     setGoals((prev) => prev.filter((g) => g.id !== id))
-  }, [isAuthenticated])
+  }, [])
 
   const handleAddTemplate = useCallback(async (tpl: GoalTemplate) => {
     setAddedTemplateIds((prev) => [...prev, tpl.id])
@@ -77,22 +69,30 @@ export default function GoalsPage() {
           <Link to="/login" className="px-4 py-1.5 text-sm font-medium bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">登录</Link>
         </div>
       )}
-      <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">当前目标</p><p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalGoals}<span className="text-sm font-normal text-gray-400 ml-1">个</span></p></div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">已完成</p><p className="text-2xl font-bold text-green-500">{completedGoals}<span className="text-sm font-normal text-gray-400 ml-1">个</span></p></div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">完成率</p><p className="text-2xl font-bold text-purple-500">{completionRate}<span className="text-sm font-normal text-gray-400 ml-1">%</span></p></div>
+      {isAuthenticated && (
+        <>
+          <section className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">当前目标</p><p className="text-2xl font-bold text-gray-900 dark:text-gray-100">{totalGoals}<span className="text-sm font-normal text-gray-400 ml-1">个</span></p></div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">已完成</p><p className="text-2xl font-bold text-green-500">{completedGoals}<span className="text-sm font-normal text-gray-400 ml-1">个</span></p></div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm"><p className="text-sm text-gray-500 dark:text-gray-400 mb-1">完成率</p><p className="text-2xl font-bold text-purple-500">{completionRate}<span className="text-sm font-normal text-gray-400 ml-1">%</span></p></div>
+          </section>
+          {totalGoals > 0 && (
+            <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">完成率</h3>
+              <div className="w-full h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }} /></div>
+              <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">已完成 {completedGoals}/{totalGoals} 个目标</p>
+            </section>
+          )}
+          <section><GoalTemplatePicker addedTemplateIds={addedTemplateIds} onAdd={handleAddTemplate} /></section>
+        </>
+      )}
+      <section>
+        {loading ? (
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm animate-pulse"><div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-4" /><div className="h-2 w-full bg-gray-100 dark:bg-gray-750 rounded mb-5" /><div className="space-y-2">{[1, 2, 3].map((i) => (<div key={i} className="h-8 bg-gray-100 dark:bg-gray-750 rounded" />))}</div></div>
+        ) : (
+          <DailyGoalList goals={goals} onAdd={isAuthenticated ? handleAdd : undefined} onToggle={isAuthenticated ? handleToggle : undefined} onDelete={isAuthenticated ? handleDelete : undefined} />
+        )}
       </section>
-      <section className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">完成率</h3>
-        <div className="w-full h-3 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-purple-500 to-purple-400 rounded-full transition-all duration-500" style={{ width: `${completionRate}%` }} /></div>
-        <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">已完成 {completedGoals}/{totalGoals} 个目标</p>
-      </section>
-      <section><GoalTemplatePicker addedTemplateIds={addedTemplateIds} onAdd={handleAddTemplate} /></section>
-      <section>{loading ? (
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm animate-pulse"><div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded mb-4" /><div className="h-2 w-full bg-gray-100 dark:bg-gray-750 rounded mb-5" /><div className="space-y-2">{[1, 2, 3].map((i) => (<div key={i} className="h-8 bg-gray-100 dark:bg-gray-750 rounded" />))}</div></div>
-      ) : (
-        <DailyGoalList goals={goals} onAdd={handleAdd} onToggle={handleToggle} onDelete={handleDelete} />
-      )}</section>
     </div>
   )
 }
