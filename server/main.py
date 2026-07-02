@@ -6,6 +6,7 @@ from routes.users import router as users_router
 from routes.chat import router as chat_router
 from routes.analytics import router as analytics_router
 from routes.goals import router as goals_router
+from routes.suggestions import router as suggestions_router
 
 app = FastAPI(title="StudyPal API", version="0.1.0")
 
@@ -16,6 +17,7 @@ app.include_router(users_router, prefix="/api/users", tags=["users"])
 app.include_router(chat_router, prefix="/api", tags=["chat"])
 app.include_router(analytics_router, prefix="/api", tags=["analytics"])
 app.include_router(goals_router, prefix="/api", tags=["goals"])
+app.include_router(suggestions_router, prefix="/api", tags=["suggestions"])
 
 @app.get("/api/health")
 def health_check():

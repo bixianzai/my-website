@@ -5,10 +5,10 @@ export interface GoalTemplate {
 }
 
 export const GOAL_TEMPLATES: GoalTemplate[] = [
-  { id: 'tpl-read', title: '阅读技术文章 30 分钟', category: '每日习惯' },
-  { id: 'tpl-leetcode', title: 'LeetCode 刷题 2 道', category: '编程练习' },
-  { id: 'tpl-course', title: '完成在线课程 1 小节', category: '系统学习' },
-  { id: 'tpl-notes', title: '整理学习笔记并复习', category: '知识巩固' },
-  { id: 'tpl-opensource', title: '阅读开源项目源码 30 分钟', category: '代码阅读' },
-  { id: 'tpl-blog', title: '写一篇技术博客或学习总结', category: '输出分享' },
+  { id: 'tpl-operations', title: '完成 10 道有理数运算练习', category: '基础计算' },
+  { id: 'tpl-equation', title: '解 5 道一元一次方程', category: '方程训练' },
+  { id: 'tpl-geometry', title: '练习线段与角的计算 3 道', category: '几何初步' },
+  { id: 'tpl-review', title: '整理本周错题并重做', category: '知识巩固' },
+  { id: 'tpl-word-problems', title: '完成 2 道方程应用题', category: '综合应用' },
+  { id: 'tpl-challenge', title: '挑战 1 道压轴题并总结思路', category: '拔高挑战' },
 ]
