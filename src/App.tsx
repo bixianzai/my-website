@@ -11,7 +11,7 @@ import GoalsPage from './pages/dashboard/GoalsPage'
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename="/studypal">
+      <BrowserRouter basename="/my-website">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
